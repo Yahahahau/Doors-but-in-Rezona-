@@ -1,0 +1,613 @@
+/* DOORS but in Rezona — UI. Palette from the reference screenshots:
+   cream text on dark warm-brown translucent panels. */
+:root {
+  --cream: #f1dcc0;
+  --cream-dim: rgba(241, 220, 192, 0.6);
+  --panel: rgba(24, 13, 9, 0.84);
+  --line: rgba(241, 220, 192, 0.22);
+  --accent: #e8b36a;
+  --band-top: 0px;
+  --band-bottom: 100%;
+  --ctrl-h: 0px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans Thai', 'Leelawadee UI', sans-serif;
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: #050302;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: var(--cream);
+}
+#game {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- HUD */
+#hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+#hud.on {
+  opacity: 1;
+}
+#hud.on button {
+  pointer-events: auto;
+}
+.topbar {
+  position: absolute;
+  top: calc(8px + var(--safe-t));
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  display: grid;
+  place-items: center;
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--cream);
+}
+#door-plate {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(#6b4a26, #4a3016);
+  border: 1px solid #c9a060;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  color: #f6e2b8;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+#door-plate span {
+  font-size: 10px;
+  letter-spacing: 2px;
+  opacity: 0.75;
+}
+#door-plate b {
+  font-size: 17px;
+  letter-spacing: 2px;
+}
+#gold {
+  min-width: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 14px;
+}
+.coin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff1a8, #e8b830 55%, #a07010);
+  box-shadow: 0 0 6px rgba(255, 200, 80, 0.5);
+}
+#room-name {
+  position: absolute;
+  top: calc(54px + var(--safe-t));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--cream-dim);
+  opacity: 0;
+}
+#room-name.show {
+  animation: fadeinout 3s ease forwards;
+}
+.landscape #room-name {
+  top: calc(var(--band-top) + 46px);
+}
+#toast {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  top: calc(var(--band-bottom) - 70px);
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+#toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.portrait #toast {
+  top: calc(var(--band-top) + 6px);
+}
+#fps {
+  position: absolute;
+  left: 10px;
+  top: calc(52px + var(--safe-t));
+  font: 11px monospace;
+  color: #9f9;
+  opacity: 0.8;
+}
+
+/* hotbar (only visible when the player owns items, like DOORS) */
+#hotbar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--line);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+#hotbar.has {
+  opacity: 1;
+}
+.landscape #hotbar {
+  bottom: calc(10px + var(--safe-b));
+}
+.portrait #hotbar {
+  top: calc(var(--band-bottom) + 6px);
+}
+.slot {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(20, 10, 6, 0.7);
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.slot.empty {
+  opacity: 0.35;
+}
+.slot.sel {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 12px rgba(232, 179, 106, 0.35);
+  transform: translateY(-4px);
+}
+.slot.lit {
+  background: rgba(80, 50, 20, 0.85);
+}
+.slot img {
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+}
+.slot .n {
+  position: absolute;
+  top: -7px;
+  left: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1a0e08;
+  border: 1px solid var(--line);
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+}
+.slot .c {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font-size: 9px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px #000;
+}
+.slot .fuel {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 3px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.slot .fuel i {
+  display: block;
+  height: 100%;
+  background: var(--cream);
+}
+.slot .fuel.low i {
+  background: #d0503a;
+}
+
+/* touch controls */
+#touch {
+  display: none;
+}
+.touch #touch {
+  display: block;
+}
+#touch button {
+  pointer-events: auto;
+  position: relative;
+  border: 2px solid rgba(241, 220, 192, 0.55);
+  background: rgba(22, 12, 8, 0.6);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+#touch button svg {
+  width: 55%;
+  height: 55%;
+  fill: none;
+  stroke: var(--cream);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#touch button.down {
+  background: rgba(241, 220, 192, 0.3);
+  transform: scale(0.94);
+}
+#touch .move,
+#touch .acts {
+  position: absolute;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+#touch .move button {
+  width: 64px;
+  height: 64px;
+}
+#touch #t-crouch {
+  width: 52px;
+  height: 52px;
+}
+#touch #t-act {
+  width: 86px;
+  height: 86px;
+  background: rgba(241, 220, 192, 0.9);
+}
+#touch #t-act svg {
+  stroke: #2a160c;
+  fill: rgba(42, 22, 12, 0.1);
+}
+#touch #t-act.ready {
+  box-shadow: 0 0 0 4px rgba(232, 179, 106, 0.5);
+}
+.landscape #touch .move {
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  bottom: calc(14px + var(--safe-b));
+}
+.landscape #touch .acts {
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(14px + var(--safe-b));
+}
+.portrait #touch .move {
+  left: 18px;
+  bottom: calc(var(--ctrl-h) * 0.22 + var(--safe-b));
+}
+.portrait #touch .acts {
+  right: 18px;
+  bottom: calc(var(--ctrl-h) * 0.18 + var(--safe-b));
+}
+.landscape.touch #hotbar {
+  bottom: calc(10px + var(--safe-b));
+}
+
+/* title card */
+#titlecard {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--band-top) + 18%);
+  text-align: center;
+  font: 900 clamp(40px, 11vmin, 92px) / 0.85 Impact, 'Arial Black', sans-serif;
+  letter-spacing: 2px;
+  color: #f6ede0;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  transform: rotate(-2deg);
+}
+#titlecard small {
+  display: block;
+  font-size: 0.42em;
+  letter-spacing: 4px;
+}
+#titlecard.show {
+  animation: title 4.5s ease forwards;
+}
+@keyframes title {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fadeinout {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- screens */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(ellipse at center, rgba(10, 5, 3, 0.25), rgba(5, 2, 1, 0.75));
+}
+.screen.on {
+  display: flex;
+}
+#screen-loading {
+  background: #1d100d;
+}
+.loading {
+  text-align: center;
+}
+.loading h2 {
+  margin: 0;
+  font: 900 clamp(34px, 8vmin, 60px) Impact, 'Arial Black', sans-serif;
+  letter-spacing: 3px;
+}
+.loading p {
+  margin: 8px 0 0;
+  opacity: 0.8;
+  font-size: 14px;
+}
+.menu {
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+}
+.logo {
+  margin: 0 0 28px;
+  font: 900 clamp(56px, 16vmin, 120px) / 0.9 Impact, 'Arial Black', sans-serif;
+  letter-spacing: 4px;
+  color: #f6ede0;
+  text-shadow:
+    0 0 30px rgba(255, 170, 90, 0.25),
+    0 6px 20px #000;
+}
+.logo small {
+  display: block;
+  font: 600 clamp(14px, 3.6vmin, 22px) system-ui, sans-serif;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 6px;
+}
+.btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition:
+    transform 0.08s,
+    background 0.2s;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn.primary {
+  background: linear-gradient(#f1dcc0, #d9bb92);
+  color: #2a160c;
+  border-color: transparent;
+}
+.btn.ghost {
+  background: transparent;
+}
+.btn.small {
+  padding: 8px;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.btn small {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+.hint {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+.touch .hint.kb {
+  display: none;
+}
+.ver {
+  font-size: 11px;
+  opacity: 0.35;
+  margin-top: 18px;
+}
+.panel {
+  width: 100%;
+  max-width: 360px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 100%;
+  overflow: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+.panel.wide {
+  max-width: 440px;
+}
+.panel h2 {
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 20px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.row output {
+  width: 42px;
+  text-align: right;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.row .seg {
+  grid-column: 2 / 4;
+}
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.seg {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.seg button {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 13px;
+  border: 0;
+  background: transparent;
+}
+.seg button.on {
+  background: var(--cream);
+  color: #2a160c;
+  font-weight: 700;
+}
+#end-stats {
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* while a menu is open the HUD stays hidden */
+#app:not([data-screen='game']) #hud {
+  opacity: 0 !important;
+}
+#app:not([data-screen='game']) #hud button {
+  pointer-events: none !important;
+}
+[hidden] {
+  display: none !important;
+}
+#quest {
+  position: absolute;
+  right: 10px;
+  top: calc(52px + var(--safe-t));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 4px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid #c9a060;
+  font: 700 12px Georgia, serif;
+  color: #f6e2b8;
+}
+.chip img {
+  width: 20px;
+  height: 20px;
+}
+@media (max-height: 430px) {
+  .logo {
+    margin-bottom: 12px;
+    font-size: clamp(40px, 14vmin, 80px);
+  }
+  .btn {
+    padding: 9px 14px;
+    font-size: 15px;
+  }
+  .hint,
+  .ver {
+    margin-top: 8px;
+  }
+}

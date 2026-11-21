@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DOORS but in Rezona — iframe / aspect-ratio test</title>
+    <style>
+      body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px system-ui, sans-serif; }
+      h1 { font-size: 16px; margin: 0 0 12px; }
+      .grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+      figure { margin: 0; }
+      figcaption { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
+      iframe { display: block; border: 1px solid #333; border-radius: 8px; background: #000; }
+    </style>
+  </head>
+  <body>
+    <h1>ทดสอบฝังเกมใน iframe หลายอัตราส่วน (คลิกในเฟรมเพื่อให้คีย์บอร์ดทำงาน)</h1>
+    <div class="grid">
+      <figure><figcaption>9:16 portrait (Rezona / มือถือ)</figcaption><iframe src="index.html" width="270" height="480" allow="autoplay; fullscreen"></iframe></figure>
+      <figure><figcaption>3:4</figcaption><iframe src="index.html" width="360" height="480" allow="autoplay; fullscreen"></iframe></figure>
+      <figure><figcaption>16:9 landscape</figcaption><iframe src="index.html" width="640" height="360" allow="autoplay; fullscreen"></iframe></figure>
+      <figure><figcaption>21:9 ultrawide</figcaption><iframe src="index.html" width="700" height="300" allow="autoplay; fullscreen"></iframe></figure>
+    </div>
+  </body>
+</html>

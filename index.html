@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#0b0604" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>DOORS but in Rezona</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%222%22 width=%2220%22 height=%2228%22 rx=%222%22 fill=%22%236e4129%22/%3E%3Ccircle cx=%2221%22 cy=%2217%22 r=%222%22 fill=%22%23e6c27a%22/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app" data-screen="screen-loading">
+      <canvas id="game"></canvas>
+
+      <!-- ================= HUD ================= -->
+      <div id="hud">
+        <div class="topbar">
+          <button id="btn-pause" class="icon-btn" aria-label="หยุดชั่วคราว">
+            <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          </button>
+          <div id="door-plate"><span>DOOR</span><b id="door-num">0000</b></div>
+          <div id="gold"><i class="coin"></i><span id="gold-val">0</span></div>
+        </div>
+        <div id="quest"></div>
+        <div id="room-name"></div>
+        <div id="toast"></div>
+        <div id="hotbar"></div>
+        <div id="touch">
+          <div class="move">
+            <button id="t-left" aria-label="ซ้าย"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" /></svg></button>
+            <button id="t-right" aria-label="ขวา"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" /></svg></button>
+          </div>
+          <div class="acts">
+            <button id="t-crouch" aria-label="ย่อตัว">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.6" /><path d="M8 20l2-6-3-2 4-3 3 3 3 1M14 14l2 6" /></svg>
+            </button>
+            <button id="t-act" aria-label="โต้ตอบ">
+              <svg viewBox="0 0 24 24"><path d="M8 13V6.5a1.5 1.5 0 0 1 3 0V12m0-6.5V4.5a1.5 1.5 0 0 1 3 0V12m0-6a1.5 1.5 0 0 1 3 0v6m0-3.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.2a6 6 0 0 1-4.6-2.2L5 14.6a1.6 1.6 0 0 1 2.4-2.1L8 13" /></svg>
+            </button>
+          </div>
+        </div>
+        <div id="fps" hidden></div>
+      </div>
+
+      <div id="titlecard"><small>THE</small>HOTEL</div>
+
+      <!-- ================= SCREENS ================= -->
+      <section id="screen-loading" class="screen on">
+        <div class="loading">
+          <h2>LOADING</h2>
+          <p>กำลังเดินทางไปที่โรงแรม…</p>
+        </div>
+      </section>
+
+      <section id="screen-menu" class="screen">
+        <div class="menu">
+          <h1 class="logo">DOORS<small>but in Rezona</small></h1>
+          <div class="btns">
+            <button id="btn-continue" class="btn primary" hidden>เล่นต่อ <small></small></button>
+            <button id="btn-start" class="btn">เริ่มเกมใหม่</button>
+            <button id="btn-settings" class="btn ghost">ตั้งค่า</button>
+          </div>
+          <p class="hint kb">A/D หรือ ←/→ เดิน · C ย่อ · E โต้ตอบ · 1-6 เลือกของ · F เปิด/ปิดไฟ · Esc หยุด</p>
+          <p class="ver">Phase 02 · Core Foundation</p>
+        </div>
+      </section>
+
+      <section id="screen-pause" class="screen">
+        <div class="panel">
+          <h2>หยุดชั่วคราว</h2>
+          <button id="btn-resume" class="btn primary">เล่นต่อ</button>
+          <button id="btn-pause-settings" class="btn">ตั้งค่า</button>
+          <button id="btn-quit" class="btn ghost">กลับเมนูหลัก</button>
+          <p class="hint">ความคืบหน้าบันทึกอัตโนมัติทุกครั้งที่ผ่านประตู</p>
+        </div>
+      </section>
+
+      <section id="screen-settings" class="screen">
+        <div class="panel wide">
+          <h2>ตั้งค่า</h2>
+          <label class="row">เสียงหลัก <input id="set-master" type="range" min="0" max="1" step="0.05" /><output></output></label>
+          <label class="row">เอฟเฟกต์ <input id="set-sfx" type="range" min="0" max="1" step="0.05" /><output></output></label>
+          <label class="row">บรรยากาศ <input id="set-amb" type="range" min="0" max="1" step="0.05" /><output></output></label>
+          <label class="row">ความสว่าง <input id="set-bright" type="range" min="0.6" max="1.6" step="0.05" /><output></output></label>
+          <div class="row">กราฟิก
+            <div class="seg" id="set-quality"><button data-v="auto">อัตโนมัติ</button><button data-v="low">ต่ำ</button><button data-v="high">สูง</button></div>
+          </div>
+          <div class="row">ปุ่มบนจอ
+            <div class="seg" id="set-touch"><button data-v="auto">อัตโนมัติ</button><button data-v="on">เปิด</button><button data-v="off">ปิด</button></div>
+          </div>
+          <div class="row">จอสั่น
+            <div class="seg" id="set-shake"><button data-v="true">เปิด</button><button data-v="false">ปิด</button></div>
+          </div>
+          <div class="row">แสดง FPS
+            <div class="seg" id="set-fps"><button data-v="true">เปิด</button><button data-v="false">ปิด</button></div>
+          </div>
+          <button id="btn-reset-save" class="btn ghost small">ลบเซฟ</button>
+          <button id="btn-settings-back" class="btn primary">กลับ</button>
+        </div>
+      </section>
+
+      <section id="screen-end" class="screen">
+        <div class="panel">
+          <h2>ถึง Door 100 แล้ว</h2>
+          <p class="hint">จบส่วน Foundation ของ Phase 02 — Entity และ Electrical Room จะมาใน Phase ถัดไป</p>
+          <p id="end-stats"></p>
+          <button id="btn-end-menu" class="btn primary">กลับเมนูหลัก</button>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
