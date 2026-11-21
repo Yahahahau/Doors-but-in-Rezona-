@@ -16,6 +16,16 @@
 ```
 เกมปรับขนาดตามกล่องที่ครอบ (ResizeObserver) ไม่ใช้ `alert` / navigation, ป้องกัน localStorage ที่ถูกบล็อกใน sandbox และปลดล็อกเสียงเมื่อแตะครั้งแรก
 
+## Deploy & ทดสอบคุณภาพ (GitHub Actions)
+
+ทุกครั้งที่ push ขึ้น `main` workflow `.github/workflows/pages.yml` จะ:
+1. ตรวจ syntax ทุกไฟล์ JS
+2. รัน `tools/ci-test.mjs` ใน Chromium แบบ headless — เปิดเกม, เดิน, เก็บกุญแจ, **เล่นอัตโนมัติ Door 0→100 หลาย seed**, ตรวจว่าห้องเก่าถูก unload, เช็ค layout แนวตั้ง/แนวนอน/iframe และต้องไม่มี JS error
+3. **ถ้าผ่านทั้งหมดเท่านั้น** จึง deploy ขึ้น GitHub Pages (ภาพหน้าจอจากการทดสอบดูได้ใน Artifacts ของแต่ละรัน)
+
+ตั้งค่าครั้งแรก: Settings → Pages → Source = **GitHub Actions**
+รันทดสอบในเครื่อง: `npm i --no-save playwright && npx playwright install chromium && node tools/ci-test.mjs`
+
 ## การควบคุม
 
 | คีย์บอร์ด | มือถือ | การกระทำ |
